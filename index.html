@@ -17,6 +17,24 @@
     <input type="text" class="form-control" v-model="criterioDeBusqueda"
         placeholder="Ingresar un criterio de busqueda...">
     <br>
+    <p class="alert alert-warning" v-if="tieneMenosDe3(criterioDeBusqueda)">
+        Ingrese al menos 3 caracteres
+    </p>
+
+    <input type="text" class="form-control" v-model="criterioDeBusquedaNombre"
+        placeholder="Ingresar nombre...">
+    <br>
+    <p class="alert alert-warning" v-if="tieneMenosDe3(criterioDeBusquedaNombre)">
+        Ingrese al menos 3 caracteres
+    </p>
+ 
+    <input type="text" class="form-control" v-model="criterioDeBusquedaDni"
+        placeholder="Ingresar dni...">
+    <br>
+    <p class="alert alert-warning" v-if="tieneMenosDe3(criterioDeBusquedaDni)">
+        Ingrese al menos 3 caracteres
+    </p>
+
     <div class="card-deck m-0">
         <div class="row">
             <div class="col" v-for="persona in personasFiltradas">
@@ -40,6 +58,8 @@
         el: '#app',
         data: {
             criterioDeBusqueda: '',
+            criterioDeBusquedaNombre: '',
+            criterioDeBusquedaDni:'',
             //Aquí, en este array es donde tienen que agregar su información
             personas: [
                 {
@@ -161,14 +181,31 @@
         computed: {
             personasFiltradas() {
                 return this.personas.filter((persona) => {
+
                     let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
-                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
+                    let registroNombre = this.getNombreCompleto(persona)
+                    let registroDni = `${persona.dni}`
+
+                    let busquedaCompleta = this.getCriterioBusqueda(this.criterioDeBusqueda)
+                    let busquedaNombre = this.getCriterioBusqueda(this.criterioDeBusquedaNombre)
+                    let busquedaDni = this.getCriterioBusqueda(this.criterioDeBusquedaDni)
+
+                    return registroCompleto.toLowerCase().includes(busquedaCompleta.toLowerCase())  && registroNombre.toLowerCase().includes(busquedaNombre.toLowerCase()) && registroDni.toLowerCase().includes(busquedaDni.toLowerCase())
+                    
                 });
             }
         },
         methods: {
             getNombreCompleto(persona) {
                 return `${persona.nombre} ${persona.apellido}`
+            },
+            getCriterioBusqueda(criterio){
+                let ret
+                criterio.length>=3? ret = criterio : ret =  ''
+                return ret
+            },
+            tieneMenosDe3(texto){
+                return texto.length>0 && texto.length<3
             }
         }
     });
